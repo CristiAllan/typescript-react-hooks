@@ -1,24 +1,52 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useRef,
+  useContext,
+  useImperativeHandle,
+  useReducer
+} from 'react';
+
+interface IUser {
+  name: string
+  login: string
+  avatar_url: string
+}
 
 function App() {
+  const [user, setUser] = useState<IUser>()
+  const [users, setUsers] = useState<[IUser]>() // apenas para o exemplo do useMemo
+  const inputRef = useRef<HTMLInputElement>(null) // useRef nunca inicia como undefined tem q ser null
+
+  const names = useMemo(() => users?.map(user => user.name).join(', ') || '', [users])
+
+  const greeting = useCallback(
+    (user: IUser) => alert(`Hello ${user.name}`),
+    []
+  )
+
+  useEffect(() => {
+    loadData()
+  }, [])
+
+  async function loadData() {
+    const response = await fetch('https://api.github.com/users/CristiAllan')
+    const data = await response.json()
+
+    setUser(data)
+  }
+
+  inputRef.current?.focus()
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {/* {user?.name} */}
+
+      <form action="">
+        <input type="text" ref={inputRef} />
+      </form>
     </div>
   );
 }
